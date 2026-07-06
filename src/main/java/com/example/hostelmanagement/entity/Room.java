@@ -2,9 +2,11 @@ package com.example.hostelmanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
- * JPA Entity representing a Room.
+ * JPA Entity representing a Room in the PG/Hostel.
  */
 @Entity
 @Table(name = "rooms")
@@ -19,10 +21,45 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "room_number", unique = true, nullable = false)
+    @Column(name = "room_number", unique = true, nullable = false, length = 20)
     private String roomNumber;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "room_type", nullable = false)
+    private RoomType roomType;
+
     @Column(nullable = false)
-    private RoomStatus status;
+    private Integer capacity;
+
+    @Column(name = "monthly_rent", nullable = false, precision = 10, scale = 2)
+    private BigDecimal monthlyRent;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "room_status", nullable = false)
+    private RoomStatus roomStatus;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private java.util.List<Tenant> tenants;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private java.util.List<Rent> rents;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

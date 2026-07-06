@@ -1,9 +1,9 @@
 package com.example.hostelmanagement.entity;
 
 /**
- * Enumeration representing the occupancy status of a Room.
+ * Enumeration representing the availability status of a Room.
  */
 public enum RoomStatus {
-    VACANT,
+    AVAILABLE,
     OCCUPIED
 }

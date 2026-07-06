@@ -2,7 +2,8 @@ package com.example.hostelmanagement.service.impl;
 
 import com.example.hostelmanagement.dto.DashboardSummaryResponse;
 import com.example.hostelmanagement.entity.RoomStatus;
-import com.example.hostelmanagement.repository.RentPaymentRepository;
+import com.example.hostelmanagement.entity.PaymentStatus;
+import com.example.hostelmanagement.repository.RentRepository;
 import com.example.hostelmanagement.repository.RoomRepository;
 import com.example.hostelmanagement.repository.TenantRepository;
 import com.example.hostelmanagement.service.DashboardService;
@@ -10,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Service implementation for compiling and computing dashboard metrics.
@@ -22,16 +23,16 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final RoomRepository roomRepository;
     private final TenantRepository tenantRepository;
-    private final RentPaymentRepository rentPaymentRepository;
+    private final RentRepository rentRepository;
 
     public DashboardServiceImpl(
             RoomRepository roomRepository,
             TenantRepository tenantRepository,
-            RentPaymentRepository rentPaymentRepository
+            RentRepository rentRepository
     ) {
         this.roomRepository = roomRepository;
         this.tenantRepository = tenantRepository;
-        this.rentPaymentRepository = rentPaymentRepository;
+        this.rentRepository = rentRepository;
     }
 
     @Override
@@ -39,22 +40,17 @@ public class DashboardServiceImpl implements DashboardService {
         log.info("Generating dashboard summary metrics");
         try {
             long totalRooms = roomRepository.count();
-            long occupiedRooms = roomRepository.countByStatus(RoomStatus.OCCUPIED);
-            long vacantRooms = roomRepository.countByStatus(RoomStatus.VACANT);
+            long occupiedRooms = roomRepository.countByRoomStatus(RoomStatus.OCCUPIED);
+            long vacantRooms = roomRepository.countByRoomStatus(RoomStatus.AVAILABLE);
             long totalTenants = tenantRepository.countByActiveTrue();
 
-            BigDecimal pendingRent = rentPaymentRepository.sumUnpaidRent();
+            BigDecimal pendingRent = rentRepository.sumByPaymentStatus(PaymentStatus.PENDING);
             if (pendingRent == null) {
                 pendingRent = BigDecimal.ZERO;
             }
 
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime startOfMonth = now.with(TemporalAdjusters.firstDayOfMonth())
-                    .withHour(0).withMinute(0).withSecond(0).withNano(0);
-            LocalDateTime endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth())
-                    .withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-
-            BigDecimal monthlyRevenue = rentPaymentRepository.sumRevenueByMonth(startOfMonth, endOfMonth);
+            String currentMonthStr = DateTimeFormatter.ofPattern("yyyy-MM").format(LocalDate.now());
+            BigDecimal monthlyRevenue = rentRepository.sumPaidAmountForCurrentMonth(currentMonthStr);
             if (monthlyRevenue == null) {
                 monthlyRevenue = BigDecimal.ZERO;
             }
