@@ -2,6 +2,7 @@ package com.example.hostelmanagement.repository;
 
 import com.example.hostelmanagement.entity.PaymentStatus;
 import com.example.hostelmanagement.entity.Rent;
+import com.example.hostelmanagement.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,36 +60,13 @@ public interface RentRepository extends JpaRepository<Rent, Long> {
      */
     Optional<Rent> findByTenantIdAndRentMonth(Long tenantId, String rentMonth);
 
-    /**
-     * Finds all rent records with the specified payment status, sorted by month descending.
-     *
-     * @param paymentStatus The payment status.
-     * @return A list of Rent records.
-     */
-    List<Rent> findByPaymentStatusOrderByRentMonthDesc(PaymentStatus paymentStatus);
+    List<Rent> findByPaymentStatusAndRoomAdminOrderByRentMonthDesc(PaymentStatus paymentStatus, User admin);
 
-    /**
-     * Finds all rent records, sorted by month descending.
-     *
-     * @return A list of Rent records.
-     */
-    List<Rent> findAllByOrderByRentMonthDesc();
+    List<Rent> findByRoomAdminOrderByRentMonthDesc(User admin);
 
-    /**
-     * Calculates the total due amount of all rent records with the specified payment status.
-     *
-     * @param status The payment status.
-     * @return The sum of due amounts, or 0 if none.
-     */
-    @Query("SELECT COALESCE(SUM(r.dueAmount), 0) FROM Rent r WHERE r.paymentStatus = :status")
-    BigDecimal sumByPaymentStatus(@Param("status") PaymentStatus status);
+    @Query("SELECT COALESCE(SUM(r.dueAmount), 0) FROM Rent r WHERE r.paymentStatus = :status AND r.room.admin = :admin")
+    BigDecimal sumByPaymentStatusAndAdmin(@Param("status") PaymentStatus status, @Param("admin") User admin);
 
-    /**
-     * Calculates the total amount paid during the current month (where payment status is PAID and month matches).
-     *
-     * @param rentMonth The month in YYYY-MM format.
-     * @return The sum of paid amounts, or 0 if none.
-     */
-    @Query("SELECT COALESCE(SUM(r.amountPaid), 0) FROM Rent r WHERE r.paymentStatus = com.example.hostelmanagement.entity.PaymentStatus.PAID AND r.rentMonth = :rentMonth")
-    BigDecimal sumPaidAmountForCurrentMonth(@Param("rentMonth") String rentMonth);
+    @Query("SELECT COALESCE(SUM(r.amountPaid), 0) FROM Rent r WHERE r.paymentStatus = com.example.hostelmanagement.entity.PaymentStatus.PAID AND r.rentMonth = :rentMonth AND r.room.admin = :admin")
+    BigDecimal sumPaidAmountForCurrentMonthAndAdmin(@Param("rentMonth") String rentMonth, @Param("admin") User admin);
 }

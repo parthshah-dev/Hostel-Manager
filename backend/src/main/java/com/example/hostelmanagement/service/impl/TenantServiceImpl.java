@@ -6,12 +6,14 @@ import com.example.hostelmanagement.dto.TenantResponse;
 import com.example.hostelmanagement.entity.Room;
 import com.example.hostelmanagement.entity.RoomStatus;
 import com.example.hostelmanagement.entity.Tenant;
+import com.example.hostelmanagement.entity.User;
 import com.example.hostelmanagement.exception.RoomCapacityExceededException;
 import com.example.hostelmanagement.exception.RoomNotFoundException;
 import com.example.hostelmanagement.exception.TenantAlreadyExistsException;
 import com.example.hostelmanagement.exception.TenantNotFoundException;
 import com.example.hostelmanagement.repository.RoomRepository;
 import com.example.hostelmanagement.repository.TenantRepository;
+import com.example.hostelmanagement.security.AuthenticationHelper;
 import com.example.hostelmanagement.service.TenantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,16 +32,23 @@ public class TenantServiceImpl implements TenantService {
 
     private final TenantRepository tenantRepository;
     private final RoomRepository roomRepository;
+    private final AuthenticationHelper authenticationHelper;
 
-    public TenantServiceImpl(TenantRepository tenantRepository, RoomRepository roomRepository) {
+    public TenantServiceImpl(
+            TenantRepository tenantRepository,
+            RoomRepository roomRepository,
+            AuthenticationHelper authenticationHelper
+    ) {
         this.tenantRepository = tenantRepository;
         this.roomRepository = roomRepository;
+        this.authenticationHelper = authenticationHelper;
     }
 
     @Override
     @Transactional
     public ApiResponse addTenant(TenantRequest request) {
-        log.info("Processing request to add tenant: {}", request.fullName());
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to add tenant: {}", currentAdmin.getEmail(), request.fullName());
 
         if (tenantRepository.existsByEmail(request.email())) {
             log.warn("Tenant creation block: Email {} already registered", request.email());
@@ -53,6 +62,11 @@ public class TenantServiceImpl implements TenantService {
 
         Room room = roomRepository.findById(request.roomId())
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + request.roomId()));
+
+        if (!room.getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Room ID {} does not belong to admin {}", room.getId(), currentAdmin.getEmail());
+            throw new RoomNotFoundException("Room not found with ID: " + request.roomId());
+        }
 
         long activeTenantsCount = tenantRepository.countByRoomIdAndActiveTrue(room.getId());
         if (activeTenantsCount >= room.getCapacity()) {
@@ -81,27 +95,41 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public List<TenantResponse> getAllTenants() {
-        log.info("Retrieving all tenants");
-        return tenantRepository.findAll().stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving all tenants for admin {}", currentAdmin.getEmail());
+        return tenantRepository.findByRoomAdmin(currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public TenantResponse getTenantById(Long id) {
-        log.info("Retrieving tenant by ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving tenant by ID: {} for admin {}", id, currentAdmin.getEmail());
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new TenantNotFoundException("Tenant not found with ID: " + id));
+
+        if (!tenant.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Tenant ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new TenantNotFoundException("Tenant not found with ID: " + id);
+        }
+
         return mapToResponse(tenant);
     }
 
     @Override
     @Transactional
     public ApiResponse updateTenant(Long id, TenantRequest request) {
-        log.info("Processing request to update tenant with ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to update tenant with ID: {}", currentAdmin.getEmail(), id);
 
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new TenantNotFoundException("Tenant not found with ID: " + id));
+
+        if (!tenant.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Tenant ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new TenantNotFoundException("Tenant not found with ID: " + id);
+        }
 
         if (!tenant.getEmail().equals(request.email()) && tenantRepository.existsByEmail(request.email())) {
             log.warn("Tenant update block: Email {} already registered", request.email());
@@ -116,6 +144,11 @@ public class TenantServiceImpl implements TenantService {
         Room oldRoom = tenant.getRoom();
         Room newRoom = roomRepository.findById(request.roomId())
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + request.roomId()));
+
+        if (!newRoom.getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Room ID {} does not belong to admin {}", newRoom.getId(), currentAdmin.getEmail());
+            throw new RoomNotFoundException("Room not found with ID: " + request.roomId());
+        }
 
         tenant.setFullName(request.fullName());
         tenant.setEmail(request.email());
@@ -147,10 +180,16 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ApiResponse deleteTenant(Long id) {
-        log.info("Processing request to delete tenant with ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to delete tenant with ID: {}", currentAdmin.getEmail(), id);
 
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new TenantNotFoundException("Tenant not found with ID: " + id));
+
+        if (!tenant.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Tenant ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new TenantNotFoundException("Tenant not found with ID: " + id);
+        }
 
         Room room = tenant.getRoom();
         tenantRepository.delete(tenant);
@@ -163,10 +202,16 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public List<TenantResponse> getTenantsByRoom(Long roomId) {
-        log.info("Retrieving tenants for Room ID: {}", roomId);
-        if (!roomRepository.existsById(roomId)) {
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving tenants for Room ID: {} for admin {}", roomId, currentAdmin.getEmail());
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + roomId));
+
+        if (!room.getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Room ID {} does not belong to admin {}", roomId, currentAdmin.getEmail());
             throw new RoomNotFoundException("Room not found with ID: " + roomId);
         }
+
         return tenantRepository.findByRoomId(roomId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -174,16 +219,24 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public TenantResponse searchTenantByEmail(String email) {
-        log.info("Searching tenant by email: {}", email);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Searching tenant by email: {} for admin {}", email, currentAdmin.getEmail());
         Tenant tenant = tenantRepository.findByEmail(email)
                 .orElseThrow(() -> new TenantNotFoundException("Tenant not found with email: " + email));
+
+        if (!tenant.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Tenant email {} does not belong to admin {}", email, currentAdmin.getEmail());
+            throw new TenantNotFoundException("Tenant not found with email: " + email);
+        }
+
         return mapToResponse(tenant);
     }
 
     @Override
     public List<TenantResponse> getActiveTenants() {
-        log.info("Retrieving all active tenants");
-        return tenantRepository.findByActiveTrue().stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving all active tenants for admin {}", currentAdmin.getEmail());
+        return tenantRepository.findByActiveTrueAndRoomAdmin(currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

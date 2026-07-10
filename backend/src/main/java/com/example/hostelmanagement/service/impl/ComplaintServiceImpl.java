@@ -5,11 +5,13 @@ import com.example.hostelmanagement.entity.Complaint;
 import com.example.hostelmanagement.entity.ComplaintCategory;
 import com.example.hostelmanagement.entity.ComplaintStatus;
 import com.example.hostelmanagement.entity.Tenant;
+import com.example.hostelmanagement.entity.User;
 import com.example.hostelmanagement.exception.ComplaintNotFoundException;
 import com.example.hostelmanagement.exception.InvalidComplaintStatusException;
 import com.example.hostelmanagement.exception.TenantNotFoundException;
 import com.example.hostelmanagement.repository.ComplaintRepository;
 import com.example.hostelmanagement.repository.TenantRepository;
+import com.example.hostelmanagement.security.AuthenticationHelper;
 import com.example.hostelmanagement.service.ComplaintService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,19 +29,31 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     private final ComplaintRepository complaintRepository;
     private final TenantRepository tenantRepository;
+    private final AuthenticationHelper authenticationHelper;
 
-    public ComplaintServiceImpl(ComplaintRepository complaintRepository, TenantRepository tenantRepository) {
+    public ComplaintServiceImpl(
+            ComplaintRepository complaintRepository,
+            TenantRepository tenantRepository,
+            AuthenticationHelper authenticationHelper
+    ) {
         this.complaintRepository = complaintRepository;
         this.tenantRepository = tenantRepository;
+        this.authenticationHelper = authenticationHelper;
     }
 
     @Override
     @Transactional
     public ApiResponse addComplaint(ComplaintRequest request) {
-        log.info("Processing complaint submission for Tenant ID: {}", request.tenantId());
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing complaint submission by admin {} for Tenant ID: {}", currentAdmin.getEmail(), request.tenantId());
 
         Tenant tenant = tenantRepository.findById(request.tenantId())
                 .orElseThrow(() -> new TenantNotFoundException("Tenant not found with ID: " + request.tenantId()));
+
+        if (!tenant.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Tenant ID {} does not belong to admin {}", request.tenantId(), currentAdmin.getEmail());
+            throw new TenantNotFoundException("Tenant not found with ID: " + request.tenantId());
+        }
 
         Complaint complaint = Complaint.builder()
                 .tenant(tenant)
@@ -57,27 +71,41 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     @Override
     public List<ComplaintResponse> getAllComplaints() {
-        log.info("Retrieving all complaints");
-        return complaintRepository.findAll().stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving all complaints for admin {}", currentAdmin.getEmail());
+        return complaintRepository.findByTenantRoomAdmin(currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ComplaintResponse getComplaintById(Long id) {
-        log.info("Retrieving complaint by ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving complaint by ID: {} for admin {}", id, currentAdmin.getEmail());
         Complaint complaint = complaintRepository.findById(id)
                 .orElseThrow(() -> new ComplaintNotFoundException("Complaint not found with ID: " + id));
+
+        if (!complaint.getTenant().getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Complaint ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new ComplaintNotFoundException("Complaint not found with ID: " + id);
+        }
+
         return mapToResponse(complaint);
     }
 
     @Override
     @Transactional
     public ApiResponse updateComplaint(Long id, ComplaintUpdateRequest request) {
-        log.info("Processing request to update complaint with ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to update complaint with ID: {}", currentAdmin.getEmail(), id);
 
         Complaint complaint = complaintRepository.findById(id)
                 .orElseThrow(() -> new ComplaintNotFoundException("Complaint not found with ID: " + id));
+
+        if (!complaint.getTenant().getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Complaint ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new ComplaintNotFoundException("Complaint not found with ID: " + id);
+        }
 
         ComplaintStatus current = complaint.getStatus();
         ComplaintStatus target = request.status();
@@ -116,37 +144,53 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     @Transactional
     public ApiResponse deleteComplaint(Long id) {
-        log.info("Processing request to delete complaint with ID: {}", id);
-        if (!complaintRepository.existsById(id)) {
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to delete complaint with ID: {}", currentAdmin.getEmail(), id);
+
+        Complaint complaint = complaintRepository.findById(id)
+                .orElseThrow(() -> new ComplaintNotFoundException("Complaint not found with ID: " + id));
+
+        if (!complaint.getTenant().getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Complaint ID {} does not belong to admin {}", id, currentAdmin.getEmail());
             throw new ComplaintNotFoundException("Complaint not found with ID: " + id);
         }
-        complaintRepository.deleteById(id);
+
+        complaintRepository.delete(complaint);
         log.info("Successfully deleted complaint with ID: {}", id);
         return new ApiResponse("Complaint deleted successfully.");
     }
 
     @Override
     public List<ComplaintResponse> getComplaintsByStatus(ComplaintStatus status) {
-        log.info("Retrieving complaints for status: {}", status);
-        return complaintRepository.findByStatus(status).stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving complaints for status: {} by admin {}", status, currentAdmin.getEmail());
+        return complaintRepository.findByStatusAndTenantRoomAdmin(status, currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ComplaintResponse> getComplaintsByCategory(ComplaintCategory category) {
-        log.info("Retrieving complaints for category: {}", category);
-        return complaintRepository.findByComplaintCategory(category).stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving complaints for category: {} by admin {}", category, currentAdmin.getEmail());
+        return complaintRepository.findByComplaintCategoryAndTenantRoomAdmin(category, currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ComplaintResponse> getComplaintsByTenant(Long tenantId) {
-        log.info("Retrieving complaints for tenant ID: {}", tenantId);
-        if (!tenantRepository.existsById(tenantId)) {
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving complaints for tenant ID: {} by admin {}", tenantId, currentAdmin.getEmail());
+
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new TenantNotFoundException("Tenant not found with ID: " + tenantId));
+
+        if (!tenant.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Tenant ID {} does not belong to admin {}", tenantId, currentAdmin.getEmail());
             throw new TenantNotFoundException("Tenant not found with ID: " + tenantId);
         }
+
         return complaintRepository.findByTenantId(tenantId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -154,11 +198,12 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     @Override
     public ComplaintStatisticsResponse getComplaintStatistics() {
-        log.info("Retrieving complaint workflow statistics");
-        long total = complaintRepository.count();
-        long open = complaintRepository.countByStatus(ComplaintStatus.OPEN);
-        long inProgress = complaintRepository.countByStatus(ComplaintStatus.IN_PROGRESS);
-        long resolved = complaintRepository.countByStatus(ComplaintStatus.RESOLVED);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving complaint workflow statistics for admin {}", currentAdmin.getEmail());
+        long total = complaintRepository.countByTenantRoomAdmin(currentAdmin);
+        long open = complaintRepository.countByStatusAndTenantRoomAdmin(ComplaintStatus.OPEN, currentAdmin);
+        long inProgress = complaintRepository.countByStatusAndTenantRoomAdmin(ComplaintStatus.IN_PROGRESS, currentAdmin);
+        long resolved = complaintRepository.countByStatusAndTenantRoomAdmin(ComplaintStatus.RESOLVED, currentAdmin);
         return new ComplaintStatisticsResponse(total, open, inProgress, resolved);
     }
 

@@ -5,6 +5,7 @@ import com.example.hostelmanagement.entity.*;
 import com.example.hostelmanagement.exception.*;
 import com.example.hostelmanagement.repository.RentRepository;
 import com.example.hostelmanagement.repository.TenantRepository;
+import com.example.hostelmanagement.security.AuthenticationHelper;
 import com.example.hostelmanagement.service.RentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,23 +26,27 @@ public class RentServiceImpl implements RentService {
     private final RentRepository rentRepository;
     private final TenantRepository tenantRepository;
     private final com.example.hostelmanagement.service.EmailService emailService;
+    private final AuthenticationHelper authenticationHelper;
 
     public RentServiceImpl(
             RentRepository rentRepository,
             TenantRepository tenantRepository,
-            com.example.hostelmanagement.service.EmailService emailService
+            com.example.hostelmanagement.service.EmailService emailService,
+            AuthenticationHelper authenticationHelper
     ) {
         this.rentRepository = rentRepository;
         this.tenantRepository = tenantRepository;
         this.emailService = emailService;
+        this.authenticationHelper = authenticationHelper;
     }
 
     @Override
     @Transactional
     public ApiResponse generateRent(GenerateRentRequest request) {
-        log.info("Generating rent records for month: {}", request.rentMonth());
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Generating rent records for month: {} by admin {}", request.rentMonth(), currentAdmin.getEmail());
 
-        List<Tenant> activeTenants = tenantRepository.findByActiveTrue();
+        List<Tenant> activeTenants = tenantRepository.findByActiveTrueAndRoomAdmin(currentAdmin);
         if (activeTenants.isEmpty()) {
             return new ApiResponse("No active tenants found. No rent records generated.");
         }
@@ -78,10 +83,16 @@ public class RentServiceImpl implements RentService {
     @Override
     @Transactional
     public ApiResponse payRent(Long rentId, RentPaymentRequest request) {
-        log.info("Recording payment for Rent ID: {}", rentId);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Recording payment for Rent ID: {} by admin {}", rentId, currentAdmin.getEmail());
 
         Rent rent = rentRepository.findById(rentId)
                 .orElseThrow(() -> new RentNotFoundException("Rent record not found with ID: " + rentId));
+
+        if (!rent.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Rent ID {} does not belong to admin {}", rentId, currentAdmin.getEmail());
+            throw new RentNotFoundException("Rent record not found with ID: " + rentId);
+        }
 
         if (rent.getPaymentStatus() == PaymentStatus.PAID) {
             log.warn("Payment block: Rent record {} already paid", rentId);
@@ -119,26 +130,35 @@ public class RentServiceImpl implements RentService {
 
     @Override
     public List<RentResponse> getPendingRents() {
-        log.info("Retrieving all pending rents");
-        return rentRepository.findByPaymentStatusOrderByRentMonthDesc(PaymentStatus.PENDING).stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving all pending rents for admin {}", currentAdmin.getEmail());
+        return rentRepository.findByPaymentStatusAndRoomAdminOrderByRentMonthDesc(PaymentStatus.PENDING, currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<RentResponse> getRentHistory() {
-        log.info("Retrieving all rent records sorted by newest month first");
-        return rentRepository.findAllByOrderByRentMonthDesc().stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving all rent records sorted by newest month first for admin {}", currentAdmin.getEmail());
+        return rentRepository.findByRoomAdminOrderByRentMonthDesc(currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<RentResponse> getTenantRentHistory(Long tenantId) {
-        log.info("Retrieving rent history for tenant ID: {}", tenantId);
-        if (!tenantRepository.existsById(tenantId)) {
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving rent history for tenant ID: {} by admin {}", tenantId, currentAdmin.getEmail());
+
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new TenantNotFoundException("Tenant not found with ID: " + tenantId));
+
+        if (!tenant.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Tenant ID {} does not belong to admin {}", tenantId, currentAdmin.getEmail());
             throw new TenantNotFoundException("Tenant not found with ID: " + tenantId);
         }
+
         return rentRepository.findByTenantId(tenantId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -146,16 +166,24 @@ public class RentServiceImpl implements RentService {
 
     @Override
     public RentResponse getRentById(Long id) {
-        log.info("Retrieving rent by ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving rent by ID: {} for admin {}", id, currentAdmin.getEmail());
         Rent rent = rentRepository.findById(id)
                 .orElseThrow(() -> new RentNotFoundException("Rent record not found with ID: " + id));
+
+        if (!rent.getRoom().getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Rent ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new RentNotFoundException("Rent record not found with ID: " + id);
+        }
+
         return mapToResponse(rent);
     }
 
     @Override
     public MonthlyRevenueResponse getMonthlyRevenue(String month) {
-        log.info("Retrieving monthly revenue for: {}", month);
-        BigDecimal totalCollected = rentRepository.sumPaidAmountForCurrentMonth(month);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving monthly revenue for: {} for admin {}", month, currentAdmin.getEmail());
+        BigDecimal totalCollected = rentRepository.sumPaidAmountForCurrentMonthAndAdmin(month, currentAdmin);
         if (totalCollected == null) {
             totalCollected = BigDecimal.ZERO;
         }
@@ -164,8 +192,9 @@ public class RentServiceImpl implements RentService {
 
     @Override
     public PendingAmountResponse getPendingAmount() {
-        log.info("Retrieving total pending due amount");
-        BigDecimal pending = rentRepository.sumByPaymentStatus(PaymentStatus.PENDING);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving total pending due amount for admin {}", currentAdmin.getEmail());
+        BigDecimal pending = rentRepository.sumByPaymentStatusAndAdmin(PaymentStatus.PENDING, currentAdmin);
         if (pending == null) {
             pending = BigDecimal.ZERO;
         }

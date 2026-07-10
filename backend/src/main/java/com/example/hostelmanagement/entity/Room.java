@@ -9,7 +9,12 @@ import java.time.LocalDateTime;
  * JPA Entity representing a Room in the PG/Hostel.
  */
 @Entity
-@Table(name = "rooms")
+@Table(
+    name = "rooms",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"admin_id", "room_number"})
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +26,12 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "room_number", unique = true, nullable = false, length = 20)
+    @Column(name = "room_number", nullable = false, length = 20)
     private String roomNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private User admin;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "room_type", nullable = false)

@@ -5,9 +5,11 @@ import com.example.hostelmanagement.dto.RoomRequest;
 import com.example.hostelmanagement.dto.RoomResponse;
 import com.example.hostelmanagement.entity.Room;
 import com.example.hostelmanagement.entity.RoomStatus;
+import com.example.hostelmanagement.entity.User;
 import com.example.hostelmanagement.exception.RoomAlreadyExistsException;
 import com.example.hostelmanagement.exception.RoomNotFoundException;
 import com.example.hostelmanagement.repository.RoomRepository;
+import com.example.hostelmanagement.security.AuthenticationHelper;
 import com.example.hostelmanagement.service.RoomService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,18 +26,21 @@ import java.util.stream.Collectors;
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
+    private final AuthenticationHelper authenticationHelper;
 
-    public RoomServiceImpl(RoomRepository roomRepository) {
+    public RoomServiceImpl(RoomRepository roomRepository, AuthenticationHelper authenticationHelper) {
         this.roomRepository = roomRepository;
+        this.authenticationHelper = authenticationHelper;
     }
 
     @Override
     @Transactional
     public ApiResponse addRoom(RoomRequest request) {
-        log.info("Processing request to add room number: {}", request.roomNumber());
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to add room number: {}", currentAdmin.getEmail(), request.roomNumber());
 
-        if (roomRepository.existsByRoomNumber(request.roomNumber())) {
-            log.warn("Room creation block: Room number {} already exists", request.roomNumber());
+        if (roomRepository.existsByRoomNumberAndAdmin(request.roomNumber(), currentAdmin)) {
+            log.warn("Room creation block: Room number {} already exists for admin {}", request.roomNumber(), currentAdmin.getEmail());
             throw new RoomAlreadyExistsException("Room already exists with room number: " + request.roomNumber());
         }
 
@@ -45,6 +50,7 @@ public class RoomServiceImpl implements RoomService {
                 .capacity(request.capacity())
                 .monthlyRent(request.monthlyRent())
                 .roomStatus(request.roomStatus())
+                .admin(currentAdmin)
                 .build();
 
         roomRepository.save(room);
@@ -55,31 +61,45 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<RoomResponse> getAllRooms() {
-        log.info("Retrieving all rooms");
-        return roomRepository.findAll().stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving all rooms for admin {}", currentAdmin.getEmail());
+        return roomRepository.findAllByAdmin(currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public RoomResponse getRoomById(Long id) {
-        log.info("Retrieving room by ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving room by ID: {} for admin {}", id, currentAdmin.getEmail());
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + id));
+
+        if (!room.getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Room ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new RoomNotFoundException("Room not found with ID: " + id);
+        }
+
         return mapToResponse(room);
     }
 
     @Override
     @Transactional
     public ApiResponse updateRoom(Long id, RoomRequest request) {
-        log.info("Processing request to update room with ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to update room with ID: {}", currentAdmin.getEmail(), id);
 
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + id));
 
+        if (!room.getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Room ID {} does not belong to admin {}", id, currentAdmin.getEmail());
+            throw new RoomNotFoundException("Room not found with ID: " + id);
+        }
+
         // Uniqueness check for room number if modified
-        if (!room.getRoomNumber().equals(request.roomNumber()) && roomRepository.existsByRoomNumber(request.roomNumber())) {
-            log.warn("Room update block: Room number {} already exists on another room record", request.roomNumber());
+        if (!room.getRoomNumber().equals(request.roomNumber()) && roomRepository.existsByRoomNumberAndAdmin(request.roomNumber(), currentAdmin)) {
+            log.warn("Room update block: Room number {} already exists on another room record for admin {}", request.roomNumber(), currentAdmin.getEmail());
             throw new RoomAlreadyExistsException("Room already exists with room number: " + request.roomNumber());
         }
 
@@ -98,14 +118,18 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public ApiResponse deleteRoom(Long id) {
-        log.info("Processing request to delete room with ID: {}", id);
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Processing request by admin {} to delete room with ID: {}", currentAdmin.getEmail(), id);
 
-        if (!roomRepository.existsById(id)) {
-            log.warn("Room deletion block: Room with ID {} not found", id);
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + id));
+
+        if (!room.getAdmin().getId().equals(currentAdmin.getId())) {
+            log.warn("Access denied: Room ID {} does not belong to admin {}", id, currentAdmin.getEmail());
             throw new RoomNotFoundException("Room not found with ID: " + id);
         }
 
-        roomRepository.deleteById(id);
+        roomRepository.delete(room);
         log.info("Successfully deleted room with ID: {}", id);
 
         return new ApiResponse("Room deleted successfully.");
@@ -113,16 +137,18 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomResponse searchRoom(String roomNumber) {
-        log.info("Searching for room number: {}", roomNumber);
-        Room room = roomRepository.findByRoomNumber(roomNumber)
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Searching for room number: {} for admin {}", roomNumber, currentAdmin.getEmail());
+        Room room = roomRepository.findByRoomNumberAndAdmin(roomNumber, currentAdmin)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with room number: " + roomNumber));
         return mapToResponse(room);
     }
 
     @Override
     public List<RoomResponse> filterRooms(RoomStatus status) {
-        log.info("Filtering rooms by status: {}", status);
-        return roomRepository.findByRoomStatus(status).stream()
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Filtering rooms by status: {} for admin {}", status, currentAdmin.getEmail());
+        return roomRepository.findByRoomStatusAndAdmin(status, currentAdmin).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

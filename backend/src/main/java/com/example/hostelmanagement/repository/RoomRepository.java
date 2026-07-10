@@ -2,6 +2,7 @@ package com.example.hostelmanagement.repository;
 
 import com.example.hostelmanagement.entity.Room;
 import com.example.hostelmanagement.entity.RoomStatus;
+import com.example.hostelmanagement.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,35 +15,15 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
-    /**
-     * Checks if a room exists with the given room number.
-     *
-     * @param roomNumber The room number to check.
-     * @return true if it exists, false otherwise.
-     */
-    boolean existsByRoomNumber(String roomNumber);
+    boolean existsByRoomNumberAndAdmin(String roomNumber, User admin);
 
-    /**
-     * Finds a room by its room number.
-     *
-     * @param roomNumber The room number.
-     * @return An Optional containing the Room, or empty if not found.
-     */
-    Optional<Room> findByRoomNumber(String roomNumber);
+    Optional<Room> findByRoomNumberAndAdmin(String roomNumber, User admin);
 
-    /**
-     * Counts the number of rooms with the specified room status.
-     *
-     * @param roomStatus The room status.
-     * @return The count of rooms.
-     */
-    long countByRoomStatus(RoomStatus roomStatus);
+    long countByRoomStatusAndAdmin(RoomStatus roomStatus, User admin);
 
-    /**
-     * Finds all rooms with the specified room status.
-     *
-     * @param roomStatus The room status.
-     * @return A list of rooms matching the status.
-     */
-    List<Room> findByRoomStatus(RoomStatus roomStatus);
+    List<Room> findByRoomStatusAndAdmin(RoomStatus roomStatus, User admin);
+
+    List<Room> findAllByAdmin(User admin);
+
+    long countByAdmin(User admin);
 }
