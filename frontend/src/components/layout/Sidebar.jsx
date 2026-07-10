@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Home, 
+  Bed,
   Users, 
   CreditCard, 
   AlertTriangle, 
@@ -20,6 +21,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Room Management', path: '/rooms', icon: Home },
+    { name: 'Beds Available', path: '/beds-available', icon: Bed },
     { name: 'Tenant Management', path: '/tenants', icon: Users },
     { name: 'Rent Management', path: '/rents', icon: CreditCard },
     { name: 'Complaint Board', path: '/complaints', icon: AlertTriangle },

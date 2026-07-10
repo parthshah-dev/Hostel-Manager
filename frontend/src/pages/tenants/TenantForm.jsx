@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -13,7 +13,11 @@ import Loader from '../../components/common/Loader';
 const TenantForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const isEdit = !!id;
+  
+  const searchParams = new URLSearchParams(location.search);
+  const preSelectedRoomId = searchParams.get('roomId');
   
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -35,6 +39,12 @@ const TenantForm = () => {
       roomId: ''
     }
   });
+
+  useEffect(() => {
+    if (preSelectedRoomId && !isEdit) {
+      setValue('roomId', preSelectedRoomId);
+    }
+  }, [preSelectedRoomId, isEdit, setValue]);
 
   // Fetch all available rooms for assignment
   useEffect(() => {

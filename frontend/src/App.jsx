@@ -12,6 +12,7 @@ import Activate from './pages/auth/Activate';
 import Dashboard from './pages/dashboard/Dashboard';
 import RoomList from './pages/rooms/RoomList';
 import RoomForm from './pages/rooms/RoomForm';
+import BedsAvailableList from './pages/rooms/BedsAvailableList';
 import TenantList from './pages/tenants/TenantList';
 import TenantForm from './pages/tenants/TenantForm';
 import RentList from './pages/rents/RentList';
@@ -75,6 +76,7 @@ const App = () => {
             <Route path="rooms" element={<RoomList />} />
             <Route path="rooms/add" element={<RoomForm />} />
             <Route path="rooms/edit/:id" element={<RoomForm />} />
+            <Route path="beds-available" element={<BedsAvailableList />} />
             
             {/* Tenant Management */}
             <Route path="tenants" element={<TenantList />} />

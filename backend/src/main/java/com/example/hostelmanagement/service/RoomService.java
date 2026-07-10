@@ -1,6 +1,7 @@
 package com.example.hostelmanagement.service;
 
 import com.example.hostelmanagement.dto.ApiResponse;
+import com.example.hostelmanagement.dto.BedsAvailableResponse;
 import com.example.hostelmanagement.dto.RoomRequest;
 import com.example.hostelmanagement.dto.RoomResponse;
 import com.example.hostelmanagement.entity.RoomStatus;
@@ -66,4 +67,6 @@ public interface RoomService {
      * @return List of RoomResponse matching status.
      */
     List<RoomResponse> filterRooms(RoomStatus status);
+
+    List<BedsAvailableResponse> getBedsAvailable();
 }

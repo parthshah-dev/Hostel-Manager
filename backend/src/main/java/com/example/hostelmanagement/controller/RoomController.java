@@ -1,6 +1,7 @@
 package com.example.hostelmanagement.controller;
 
 import com.example.hostelmanagement.dto.ApiResponse;
+import com.example.hostelmanagement.dto.BedsAvailableResponse;
 import com.example.hostelmanagement.dto.RoomRequest;
 import com.example.hostelmanagement.dto.RoomResponse;
 import com.example.hostelmanagement.entity.RoomStatus;
@@ -90,5 +91,11 @@ public class RoomController {
     public ResponseEntity<List<RoomResponse>> filterRooms(@PathVariable("status") RoomStatus status) {
         List<RoomResponse> rooms = roomService.filterRooms(status);
         return ResponseEntity.ok(rooms);
+    }
+
+    @GetMapping("/beds-available")
+    public ResponseEntity<List<BedsAvailableResponse>> getBedsAvailable() {
+        List<BedsAvailableResponse> bedsAvailable = roomService.getBedsAvailable();
+        return ResponseEntity.ok(bedsAvailable);
     }
 }

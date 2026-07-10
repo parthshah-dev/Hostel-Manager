@@ -1,6 +1,7 @@
 package com.example.hostelmanagement.service.impl;
 
 import com.example.hostelmanagement.dto.ApiResponse;
+import com.example.hostelmanagement.dto.BedsAvailableResponse;
 import com.example.hostelmanagement.dto.RoomRequest;
 import com.example.hostelmanagement.dto.RoomResponse;
 import com.example.hostelmanagement.entity.Room;
@@ -9,6 +10,7 @@ import com.example.hostelmanagement.entity.User;
 import com.example.hostelmanagement.exception.RoomAlreadyExistsException;
 import com.example.hostelmanagement.exception.RoomNotFoundException;
 import com.example.hostelmanagement.repository.RoomRepository;
+import com.example.hostelmanagement.repository.TenantRepository;
 import com.example.hostelmanagement.security.AuthenticationHelper;
 import com.example.hostelmanagement.service.RoomService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +28,16 @@ import java.util.stream.Collectors;
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
+    private final TenantRepository tenantRepository;
     private final AuthenticationHelper authenticationHelper;
 
-    public RoomServiceImpl(RoomRepository roomRepository, AuthenticationHelper authenticationHelper) {
+    public RoomServiceImpl(
+            RoomRepository roomRepository,
+            TenantRepository tenantRepository,
+            AuthenticationHelper authenticationHelper
+    ) {
         this.roomRepository = roomRepository;
+        this.tenantRepository = tenantRepository;
         this.authenticationHelper = authenticationHelper;
     }
 
@@ -164,5 +172,19 @@ public class RoomServiceImpl implements RoomService {
                 room.getCreatedAt(),
                 room.getUpdatedAt()
         );
+    }
+
+    @Override
+    public List<BedsAvailableResponse> getBedsAvailable() {
+        User currentAdmin = authenticationHelper.getCurrentUser();
+        log.info("Retrieving rooms with available beds for admin {}", currentAdmin.getEmail());
+        return roomRepository.findAllByAdmin(currentAdmin).stream()
+                .map(room -> {
+                    long activeTenants = tenantRepository.countByRoomIdAndActiveTrue(room.getId());
+                    int bedsAvailable = room.getCapacity() - (int) activeTenants;
+                    return new BedsAvailableResponse(room.getId(), room.getRoomNumber(), bedsAvailable, room.getMonthlyRent());
+                })
+                .filter(response -> response.bedsAvailable() > 0)
+                .collect(Collectors.toList());
     }
 }
