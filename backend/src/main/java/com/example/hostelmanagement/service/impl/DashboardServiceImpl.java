@@ -16,9 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Service implementation for compiling and computing dashboard metrics.
- */
+
 @Service
 @Slf4j
 public class DashboardServiceImpl implements DashboardService {
@@ -74,7 +72,7 @@ public class DashboardServiceImpl implements DashboardService {
             );
         } catch (Exception e) {
             log.error("Error occurred while generating dashboard summary for admin {}. Falling back to zero values.", currentAdmin.getEmail(), e);
-            // Default everything to zero on failure to prevent breaking client requests
+
             return new DashboardSummaryResponse(
                     0, 0, 0, 0,
                     BigDecimal.ZERO,

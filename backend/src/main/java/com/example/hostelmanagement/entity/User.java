@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * JPA Entity representing a User in the system.
- */
+
 @Entity
 @Table(name = "users")
 @Getter

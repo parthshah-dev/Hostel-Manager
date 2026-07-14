@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Scheduler component executing automated background tasks for Rent notifications.
- */
+
 @Component
 @Slf4j
 public class RentReminderScheduler {
@@ -26,11 +24,7 @@ public class RentReminderScheduler {
         this.emailService = emailService;
     }
 
-    /**
-     * Automated task running at 10:00 AM on the 1st of every month to email rent due reminders
-     * to all active tenants who have PENDING rents.
-     * Cron format: second, minute, hour, day of month, month, day of week
-     */
+
     @Scheduled(cron = "${rent.reminder.cron:0 0 10 1 * *}")
     public void sendMonthlyRentDueReminders() {
         log.info("Starting automated monthly rent due reminders scheduler");

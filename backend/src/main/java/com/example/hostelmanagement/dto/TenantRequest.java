@@ -4,9 +4,7 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * DTO record for adding or updating a Tenant.
- */
+
 public record TenantRequest(
     @NotBlank(message = "Full name must not be blank")
     @Size(max = 100, message = "Full name must be at most 100 characters long")

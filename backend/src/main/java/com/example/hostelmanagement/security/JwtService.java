@@ -15,9 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-/**
- * Service class responsible for generating, parsing, and validating JWT tokens.
- */
+
 @Service
 public class JwtService {
 
@@ -27,31 +25,23 @@ public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
 
-    /**
-     * Extracts the username (email) from the JWT token.
-     */
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /**
-     * Extracts a single claim from the token claims using a resolver function.
-     */
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    /**
-     * Generates a JWT token for the user details with no extra claims.
-     */
+
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    /**
-     * Generates a JWT token with custom claims and standard claims.
-     */
+
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(extraClaims)
@@ -62,9 +52,7 @@ public class JwtService {
                 .compact();
     }
 
-    /**
-     * Checks if the token is valid for the given UserDetails (username matches and token not expired).
-     */
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -87,7 +75,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        // Safe key conversion using standard UTF-8 bytes to prevent base64 encoding requirement
+
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }

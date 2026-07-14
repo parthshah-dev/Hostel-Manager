@@ -22,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation containing core business flows for managing Tenants
- * and executing automatic Room occupancy recalculations.
- */
+
 @Service
 @Slf4j
 public class TenantServiceImpl implements TenantService {

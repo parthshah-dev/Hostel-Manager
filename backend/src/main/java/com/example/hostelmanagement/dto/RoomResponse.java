@@ -5,9 +5,7 @@ import com.example.hostelmanagement.entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * DTO record representing a Room response payload.
- */
+
 public record RoomResponse(
     Long id,
     String roomNumber,

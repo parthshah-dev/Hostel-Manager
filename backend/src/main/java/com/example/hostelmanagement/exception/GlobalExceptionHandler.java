@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
-/**
- * Controller advice to intercept and handle exceptions globally,
- * returning a standard JSON error response format.
- */
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {

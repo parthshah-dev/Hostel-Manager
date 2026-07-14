@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * DTO record representing a Rent response payload.
- */
+
 public record RentResponse(
     Long id,
     Long tenantId,

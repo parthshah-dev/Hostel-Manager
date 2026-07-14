@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * JPA Entity representing a PG/Hostel Tenant.
- */
+
 @Entity
 @Table(name = "tenants")
 @Getter

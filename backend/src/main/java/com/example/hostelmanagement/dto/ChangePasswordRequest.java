@@ -3,9 +3,7 @@ package com.example.hostelmanagement.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO for password change requests.
- */
+
 public record ChangePasswordRequest(
     @NotBlank(message = "Old password must not be blank")
     String oldPassword,

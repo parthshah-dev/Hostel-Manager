@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Repository interface for managing {@link Complaint} entities.
- */
+
 @Repository
 public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
 

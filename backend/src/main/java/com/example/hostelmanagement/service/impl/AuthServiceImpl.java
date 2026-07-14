@@ -22,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Service implementation containing authentication, registration, activation,
- * and password recovery logic.
- */
+
 @Service
 @Slf4j
 public class AuthServiceImpl implements AuthService {
@@ -111,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginRequest request) {
         log.info("Processing login request for email: {}", request.email());
 
-        // We load the user first to perform activation verification explicitly
+
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 

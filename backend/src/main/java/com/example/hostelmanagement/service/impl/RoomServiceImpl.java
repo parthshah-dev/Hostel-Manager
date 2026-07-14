@@ -20,9 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation offering transaction boundaries and business validation rules for Room operations.
- */
+
 @Service
 @Slf4j
 public class RoomServiceImpl implements RoomService {
@@ -105,7 +103,7 @@ public class RoomServiceImpl implements RoomService {
             throw new RoomNotFoundException("Room not found with ID: " + id);
         }
 
-        // Uniqueness check for room number if modified
+
         if (!room.getRoomNumber().equals(request.roomNumber()) && roomRepository.existsByRoomNumberAndAdmin(request.roomNumber(), currentAdmin)) {
             log.warn("Room update block: Room number {} already exists on another room record for admin {}", request.roomNumber(), currentAdmin.getEmail());
             throw new RoomAlreadyExistsException("Room already exists with room number: " + request.roomNumber());

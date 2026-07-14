@@ -9,9 +9,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
-/**
- * Service implementation for dispatching emails using Brevo Transactional Email REST API.
- */
+
 @Service
 @Slf4j
 public class EmailServiceImpl implements EmailService {
@@ -219,7 +217,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    // Java Records representing Brevo request JSON payloads
+
     private record BrevoSender(String name, String email) {}
     private record BrevoRecipient(String email, String name) {}
     private record BrevoEmailRequest(

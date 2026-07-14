@@ -5,9 +5,7 @@ import com.example.hostelmanagement.entity.RoomType;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
-/**
- * DTO record for adding or updating a Room.
- */
+
 public record RoomRequest(
     @NotBlank(message = "Room number must not be blank")
     @Size(max = 20, message = "Room number must be at most 20 characters long")

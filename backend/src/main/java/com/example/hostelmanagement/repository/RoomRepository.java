@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository interface for managing {@link Room} entities.
- */
+
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
 

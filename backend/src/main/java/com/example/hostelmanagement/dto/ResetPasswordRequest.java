@@ -3,9 +3,7 @@ package com.example.hostelmanagement.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO for reset password request.
- */
+
 public record ResetPasswordRequest(
     @NotBlank(message = "Token must not be blank")
     String token,

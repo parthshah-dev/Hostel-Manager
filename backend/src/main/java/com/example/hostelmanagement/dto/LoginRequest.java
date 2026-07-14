@@ -3,9 +3,7 @@ package com.example.hostelmanagement.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-/**
- * DTO for login request.
- */
+
 public record LoginRequest(
     @NotBlank(message = "Email must not be blank")
     @Email(message = "Email must be a valid email address")

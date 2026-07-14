@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * JPA Entity representing a tenant Complaint.
- */
+
 @Entity
 @Table(
     name = "complaints",

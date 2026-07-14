@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
-/**
- * Service to load user-specific data from database for Spring Security integration.
- */
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -31,9 +29,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getEmail(),
                 user.getPassword(),
                 user.isEnabled(),
-                true, // accountNonExpired
-                true, // credentialsNonExpired
-                true, // accountNonLocked
+                true, 
+                true, 
+                true, 
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }

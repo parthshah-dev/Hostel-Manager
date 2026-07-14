@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * JPA Entity representing a monthly Rent record.
- */
+
 @Entity
 @Table(
     name = "rents",

@@ -20,9 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation managing Complaint creation, transitions, and filters.
- */
+
 @Service
 @Slf4j
 public class ComplaintServiceImpl implements ComplaintService {

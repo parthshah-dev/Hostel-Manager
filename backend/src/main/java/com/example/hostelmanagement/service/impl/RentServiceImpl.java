@@ -16,9 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation containing transaction boundaries and business rules for Rent ledgers.
- */
+
 @Service
 @Slf4j
 public class RentServiceImpl implements RentService {

@@ -5,9 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * JPA Entity representing a Room in the PG/Hostel.
- */
+
 @Entity
 @Table(
     name = "rooms",
