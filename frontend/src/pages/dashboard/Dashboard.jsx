@@ -40,7 +40,7 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        // Call backend APIs in parallel
+
         const [
           summaryRes, 
           complaintStatsRes, 
@@ -75,7 +75,7 @@ const Dashboard = () => {
     return <Loader type="spinner" className="h-96" />;
   }
 
-  // Fallback / default values
+
   const totalRooms = summary?.totalRooms || 0;
   const occupiedRooms = summary?.occupiedRooms || 0;
   const vacantRooms = summary?.vacantRooms || 0;
@@ -83,13 +83,13 @@ const Dashboard = () => {
   const pendingRent = summary?.pendingRent || 0;
   const monthlyRevenue = summary?.monthlyRevenue || 0;
 
-  // Pie chart data for Room Occupancy
+
   const pieData = [
-    { name: 'Occupied', value: occupiedRooms, color: '#2563eb' }, // Blue
-    { name: 'Vacant', value: vacantRooms, color: '#94a3b8' }      // Slate
+    { name: 'Occupied', value: occupiedRooms, color: '#2563eb' }, 
+    { name: 'Vacant', value: vacantRooms, color: '#94a3b8' }      
   ];
 
-  // Revenue chart data - generate mock/sample past history based on current revenue
+
   const revenueData = [
     { month: 'Jan', revenue: Math.round(monthlyRevenue * 0.8) },
     { month: 'Feb', revenue: Math.round(monthlyRevenue * 0.85) },
@@ -132,13 +132,13 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
-      {/* Page Header */}
+
       <div>
         <h1 className="text-2xl font-black text-slate-800 tracking-tight">Overview Dashboard</h1>
         <p className="text-xs text-slate-400 mt-1">Hostel/PG analytics, occupancy rates, and financial reports.</p>
       </div>
 
-      {/* Grid of Summary Cards */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {cards.map((card, idx) => {
           const Icon = card.icon;
@@ -157,9 +157,9 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Charts Section */}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Area Chart */}
+
         <Card title="Revenue Growth" subtitle="Monthly collection report" className="lg:col-span-2">
           <div className="h-72 w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -180,7 +180,7 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        {/* Room Occupancy Pie Chart */}
+
         <Card title="Room Occupancy" subtitle="Current room utilization status">
           <div className="h-56 w-full flex items-center justify-center relative mt-4">
             {totalRooms === 0 ? (
@@ -212,7 +212,7 @@ const Dashboard = () => {
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Occupied</span>
             </div>
           </div>
-          {/* Legend */}
+
           <div className="flex justify-center gap-6 mt-2 text-xs">
             {pieData.map((d, i) => (
               <div key={i} className="flex items-center gap-1.5">
@@ -224,9 +224,9 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Grid of Recents */}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Rent Payments */}
+
         <Card 
           title="Recent Rent Payments" 
           subtitle="Latest transactions processed"
@@ -267,7 +267,7 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {/* Recent Complaints */}
+
         <Card 
           title="Recent Complaints" 
           subtitle="Latest issues reported by tenants"
@@ -307,7 +307,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Pending Rent Overview */}
+
       <Card 
         title="Pending Rent Summary" 
         subtitle="Unpaid rent lists requiring collection"

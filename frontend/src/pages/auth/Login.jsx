@@ -60,7 +60,7 @@ const Login = () => {
         <div className="bg-white py-8 px-4 border border-slate-200 sm:rounded-2xl sm:px-10 shadow-xs">
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             
-            {/* Email Field */}
+
             <div className="relative">
               <Input
                 label="Admin Email Address"
@@ -76,13 +76,13 @@ const Login = () => {
                     message: 'Invalid email address'
                   }
                 })}
-                // Note: React hook form uses custom naming if needed to prevent browser autofill,
-                // but since the register name is used, let's map name to the email property during submission.
-                // Wait! Let's just name it 'email' directly to match the record keys.
+
+
+
               />
             </div>
 
-            {/* Password Field */}
+
             <div className="relative">
               <Input
                 label="Password"
@@ -108,7 +108,7 @@ const Login = () => {
               </button>
             </div>
 
-            {/* Submit Button */}
+
             <div>
               <Button
                 type="submit"
@@ -121,7 +121,7 @@ const Login = () => {
             </div>
           </form>
 
-          {/* Register Link */}
+
           <div className="mt-6 text-center text-xs text-slate-400">
             Don't have an account?{' '}
             <Link to="/register" className="font-bold text-blue-600 hover:text-blue-700">

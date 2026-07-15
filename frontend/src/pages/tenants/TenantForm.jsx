@@ -46,12 +46,12 @@ const TenantForm = () => {
     }
   }, [preSelectedRoomId, isEdit, setValue]);
 
-  // Fetch all available rooms for assignment
+
   useEffect(() => {
     const loadRooms = async () => {
       try {
         const response = await axiosInstance.get('/api/rooms');
-        // Let's list rooms that are available, or include the current tenant's room if editing
+
         setRooms(response.data);
       } catch (error) {
         console.error(error);
@@ -61,7 +61,7 @@ const TenantForm = () => {
     loadRooms();
   }, []);
 
-  // Load tenant details if editing
+
   useEffect(() => {
     if (isEdit) {
       const fetchTenantDetails = async () => {
@@ -132,7 +132,7 @@ const TenantForm = () => {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      {/* Header */}
+
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate('/tenants')}
@@ -152,7 +152,7 @@ const TenantForm = () => {
 
       <Card>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Full Name */}
+
           <Input
             label="Full Name"
             name="fullName"
@@ -166,7 +166,7 @@ const TenantForm = () => {
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Email */}
+
             <Input
               label="Email Address"
               name="email"
@@ -183,7 +183,7 @@ const TenantForm = () => {
               })}
             />
 
-            {/* Phone Number */}
+
             <Input
               label="Phone Number"
               name="phoneNumber"
@@ -201,7 +201,7 @@ const TenantForm = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Aadhaar Number */}
+
             <Input
               label="Aadhaar Card Number"
               name="aadhaarNumber"
@@ -217,7 +217,7 @@ const TenantForm = () => {
               })}
             />
 
-            {/* Check-in Date */}
+
             <Input
               label="Check-In Date"
               name="checkInDate"
@@ -231,7 +231,7 @@ const TenantForm = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Security Deposit */}
+
             <Input
               label="Security Deposit Paid (INR)"
               name="securityDeposit"
@@ -246,7 +246,7 @@ const TenantForm = () => {
               })}
             />
 
-            {/* Room ID Assignment */}
+
             <Select
               label="Assign Room"
               name="roomId"
@@ -260,7 +260,7 @@ const TenantForm = () => {
             />
           </div>
 
-          {/* Action Buttons */}
+
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <Button
               variant="secondary"

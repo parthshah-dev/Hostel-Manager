@@ -22,22 +22,22 @@ const RentList = () => {
   const [loading, setLoading] = useState(true);
   const [totalPendingAmount, setTotalPendingAmount] = useState(0);
 
-  // Search & Filter state
+
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Pagination state
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Generate Rent dialog state
+
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [generating, setGenerating] = useState(false);
 
-  // Pay Rent modal state
+
   const [selectedRent, setSelectedRent] = useState(null);
   const [paying, setPaying] = useState(false);
 
-  // Print Invoice Modal state
+
   const [invoiceRent, setInvoiceRent] = useState(null);
 
   const {
@@ -47,7 +47,7 @@ const RentList = () => {
     reset: resetGenerate
   } = useForm({
     defaultValues: {
-      rentMonth: new Date().toISOString().slice(0, 7) // Default to current YYYY-MM
+      rentMonth: new Date().toISOString().slice(0, 7) 
     }
   });
 
@@ -84,7 +84,7 @@ const RentList = () => {
     fetchData();
   }, []);
 
-  // Handle Rent Generation
+
   const onGenerateSubmit = async (data) => {
     try {
       setGenerating(true);
@@ -103,7 +103,7 @@ const RentList = () => {
     }
   };
 
-  // Handle Recording Rent Payment
+
   const onPaymentSubmit = async (data) => {
     if (!selectedRent) return;
     try {
@@ -113,7 +113,7 @@ const RentList = () => {
         remarks: data.remarks
       });
       
-      // Success toast displays payment message and confirmation email notice
+
       toast.success((t) => (
         <span>
           <b>{response.data.message || 'Rent recorded as Paid.'}</b>
@@ -133,7 +133,7 @@ const RentList = () => {
     }
   };
 
-  // Filter & Search
+
   const filteredRents = rents.filter((r) => {
     return (
       r.tenantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -142,7 +142,7 @@ const RentList = () => {
     );
   });
 
-  // Pagination
+
   const totalPages = Math.ceil(filteredRents.length / itemsPerPage);
   const paginatedRents = filteredRents.slice(
     (currentPage - 1) * itemsPerPage,
@@ -155,7 +155,7 @@ const RentList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">Rent Management</h1>
@@ -179,7 +179,7 @@ const RentList = () => {
         </div>
       </div>
 
-      {/* Info Stats Banner */}
+
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-5 text-white flex items-center justify-between shadow-md shadow-blue-600/10">
         <div className="space-y-1">
           <span className="text-xs font-bold text-blue-100 uppercase tracking-wider">Outstanding Balance</span>
@@ -191,7 +191,7 @@ const RentList = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
+
       <Card bodyClassName="py-4">
         <SearchBar
           value={searchQuery}
@@ -203,7 +203,7 @@ const RentList = () => {
         />
       </Card>
 
-      {/* Pending Rents Table */}
+
       {loading ? (
         <Loader type="spinner" className="py-20" />
       ) : paginatedRents.length === 0 ? (
@@ -271,7 +271,7 @@ const RentList = () => {
         </Card>
       )}
 
-      {/* Generate Monthly Rent Modal */}
+
       <Modal
         isOpen={showGenerateModal}
         onClose={() => setShowGenerateModal(false)}
@@ -313,7 +313,7 @@ const RentList = () => {
         </form>
       </Modal>
 
-      {/* Pay Rent Modal */}
+
       <Modal
         isOpen={selectedRent !== null}
         onClose={() => setSelectedRent(null)}
@@ -373,7 +373,7 @@ const RentList = () => {
         </form>
       </Modal>
 
-      {/* Print Invoice Modal */}
+
       <Modal
         isOpen={invoiceRent !== null}
         onClose={() => setInvoiceRent(null)}
@@ -382,7 +382,7 @@ const RentList = () => {
       >
         {invoiceRent && (
           <div className="space-y-6">
-            {/* Invoice Printable Content */}
+
             <div id="invoice-print" className="p-6 bg-white border border-slate-200 rounded-xl space-y-6 text-slate-600 text-xs">
               <div className="flex justify-between items-start">
                 <div>
@@ -409,7 +409,7 @@ const RentList = () => {
                 </div>
               </div>
 
-              {/* Items Table */}
+
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-bold">

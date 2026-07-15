@@ -42,7 +42,7 @@ const Modal = ({
       <div 
         className={`bg-white rounded-xl shadow-xl w-full ${sizes[size]} transform transition-all duration-300 scale-100 flex flex-col max-h-[90vh] z-10`}
       >
-        {/* Header */}
+
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <h3 className="text-base font-bold text-slate-800 tracking-tight">{title}</h3>
           <button 
@@ -53,7 +53,7 @@ const Modal = ({
           </button>
         </div>
 
-        {/* Content */}
+
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {children}
         </div>

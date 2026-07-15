@@ -17,15 +17,15 @@ const RoomList = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Search & Filter state
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Pagination state
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Confirm delete dialog state
+
   const [deleteId, setDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -62,14 +62,14 @@ const RoomList = () => {
     }
   };
 
-  // Filter & search implementation
+
   const filteredRooms = rooms.filter((room) => {
     const matchesSearch = room.roomNumber.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === '' || room.roomStatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  // Pagination calculation
+
   const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
   const paginatedRooms = filteredRooms.slice(
     (currentPage - 1) * itemsPerPage,
@@ -82,7 +82,7 @@ const RoomList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">Room Management</h1>
@@ -97,7 +97,7 @@ const RoomList = () => {
         </Button>
       </div>
 
-      {/* Search & Filter Bar */}
+
       <Card bodyClassName="py-4">
         <SearchBar
           value={searchQuery}
@@ -125,7 +125,7 @@ const RoomList = () => {
         </SearchBar>
       </Card>
 
-      {/* Rooms Table / Grid */}
+
       {loading ? (
         <Loader type="spinner" className="py-20" />
       ) : paginatedRooms.length === 0 ? (
@@ -191,7 +191,7 @@ const RoomList = () => {
         </Card>
       )}
 
-      {/* Delete Dialog */}
+
       <ConfirmDialog
         isOpen={deleteId !== null}
         onClose={() => setDeleteId(null)}

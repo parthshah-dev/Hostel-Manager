@@ -11,13 +11,13 @@ const ConfirmDialog = ({
   message = 'This action cannot be undone. Please confirm to proceed.',
   confirmLabel = 'Delete',
   cancelLabel = 'Cancel',
-  variant = 'danger', // 'danger' | 'primary'
+  variant = 'danger', 
   loading = false
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
       <div className="flex flex-col gap-4">
-        {/* Warning Icon & message */}
+
         <div className="flex gap-3">
           <div className={`p-2 rounded-lg h-fit ${
             variant === 'danger' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'
@@ -29,7 +29,7 @@ const ConfirmDialog = ({
           </div>
         </div>
 
-        {/* Buttons */}
+
         <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
           <Button variant="secondary" size="sm" onClick={onClose} disabled={loading}>
             {cancelLabel}

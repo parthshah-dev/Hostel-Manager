@@ -21,24 +21,24 @@ const ComplaintList = () => {
   const [tenants, setTenants] = useState([]);
   const [statistics, setStatistics] = useState(null);
 
-  // Search & Filter state
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  // Pagination state
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Add Complaint Modal state
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [adding, setAdding] = useState(false);
 
-  // Update Complaint Modal state
+
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [updating, setUpdating] = useState(false);
 
-  // Delete Confirm Dialog state
+
   const [deleteId, setDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -91,7 +91,7 @@ const ComplaintList = () => {
     fetchData();
   }, []);
 
-  // Set default values when selected complaint changes
+
   useEffect(() => {
     if (selectedComplaint) {
       setUpdateValue('status', selectedComplaint.status);
@@ -99,7 +99,7 @@ const ComplaintList = () => {
     }
   }, [selectedComplaint, setUpdateValue]);
 
-  // Handle Add Complaint Submission
+
   const onAddSubmit = async (data) => {
     try {
       setAdding(true);
@@ -121,7 +121,7 @@ const ComplaintList = () => {
     }
   };
 
-  // Handle Update Status Submission
+
   const onUpdateSubmit = async (data) => {
     if (!selectedComplaint) return;
     try {
@@ -143,7 +143,7 @@ const ComplaintList = () => {
     }
   };
 
-  // Handle Delete Complaint
+
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
@@ -160,7 +160,7 @@ const ComplaintList = () => {
     }
   };
 
-  // Filter complaints
+
   const filteredComplaints = complaints.filter((c) => {
     const matchesSearch = 
       c.tenantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -171,7 +171,7 @@ const ComplaintList = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  // Pagination
+
   const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
   const paginatedComplaints = filteredComplaints.slice(
     (currentPage - 1) * itemsPerPage,
@@ -199,7 +199,7 @@ const ComplaintList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">Complaint Board</h1>
@@ -214,7 +214,7 @@ const ComplaintList = () => {
         </Button>
       </div>
 
-      {/* Stats Summary Panel */}
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Complaints</p>
@@ -234,7 +234,7 @@ const ComplaintList = () => {
         </div>
       </div>
 
-      {/* Search & Filters */}
+
       <Card bodyClassName="py-4">
         <SearchBar
           value={searchQuery}
@@ -275,7 +275,7 @@ const ComplaintList = () => {
         </SearchBar>
       </Card>
 
-      {/* Complaints Table */}
+
       {loading ? (
         <Loader type="spinner" className="py-20" />
       ) : paginatedComplaints.length === 0 ? (
@@ -347,7 +347,7 @@ const ComplaintList = () => {
         </Card>
       )}
 
-      {/* File Complaint Modal */}
+
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
@@ -416,7 +416,7 @@ const ComplaintList = () => {
         </form>
       </Modal>
 
-      {/* Update Complaint Status Modal */}
+
       <Modal
         isOpen={selectedComplaint !== null}
         onClose={() => setSelectedComplaint(null)}
@@ -480,7 +480,7 @@ const ComplaintList = () => {
         </form>
       </Modal>
 
-      {/* Delete Complaint Dialog */}
+
       <ConfirmDialog
         isOpen={deleteId !== null}
         onClose={() => setDeleteId(null)}

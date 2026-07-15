@@ -10,7 +10,7 @@ const Activate = () => {
   const navigate = useNavigate();
   const token = searchParams.get('token');
 
-  const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
+  const [status, setStatus] = useState('loading'); 
   const [message, setMessage] = useState('Activating your account, please wait...');
 
   useEffect(() => {

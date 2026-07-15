@@ -63,7 +63,7 @@ const Register = () => {
         <div className="bg-white py-8 px-4 border border-slate-200 sm:rounded-2xl sm:px-10 shadow-xs">
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
-            {/* Full Name */}
+
             <div>
               <Input
                 label="Full Name"
@@ -82,7 +82,7 @@ const Register = () => {
               />
             </div>
 
-            {/* Email Field */}
+
             <div>
               <Input
                 label="Admin Email Address"
@@ -101,7 +101,7 @@ const Register = () => {
               />
             </div>
 
-            {/* Password Field */}
+
             <div className="relative">
               <Input
                 label="Password"
@@ -127,7 +127,7 @@ const Register = () => {
               </button>
             </div>
 
-            {/* Submit Button */}
+
             <div>
               <Button
                 type="submit"
@@ -140,7 +140,7 @@ const Register = () => {
             </div>
           </form>
 
-          {/* Login Link */}
+
           <div className="mt-6 text-center text-xs text-slate-400">
             Already have an account?{' '}
             <Link to="/login" className="font-bold text-blue-600 hover:text-blue-700">

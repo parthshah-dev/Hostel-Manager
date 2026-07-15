@@ -35,12 +35,12 @@ const BedsAvailableList = () => {
     fetchBedsAvailable();
   }, []);
 
-  // Search filter
+
   const filteredBeds = bedsAvailableList.filter((item) =>
     item.roomNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Pagination calculation
+
   const totalPages = Math.ceil(filteredBeds.length / itemsPerPage);
   const paginatedBeds = filteredBeds.slice(
     (currentPage - 1) * itemsPerPage,
@@ -53,7 +53,7 @@ const BedsAvailableList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <div>
         <h1 className="text-2xl font-black text-slate-800 tracking-tight">Beds Available</h1>
         <p className="text-xs text-slate-400 mt-1">
@@ -61,7 +61,7 @@ const BedsAvailableList = () => {
         </p>
       </div>
 
-      {/* Search Bar */}
+
       <Card bodyClassName="py-4">
         <SearchBar
           value={searchQuery}
@@ -73,7 +73,7 @@ const BedsAvailableList = () => {
         />
       </Card>
 
-      {/* List / Table */}
+
       {loading ? (
         <Loader type="spinner" className="py-20" />
       ) : paginatedBeds.length === 0 ? (

@@ -1,11 +1,8 @@
-# Project root gitignore
 
-# Backend / Maven specific ignore rules
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
 backend/HELP.md
 
-# Frontend / Node specific ignore rules
 frontend/node_modules/
 frontend/dist/
 frontend/.env.local
@@ -17,7 +14,6 @@ frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/pnpm-debug.log*
 
-# STS / IDE specific files
 .apt_generated
 .classpath
 .factorypath
@@ -37,12 +33,10 @@ nbdist/
 build/
 .vscode/
 
-# Logs and OS files
 *.log
 .DS_Store
 Thumbs.db
 
-# Backend Environment Credentials
 backend/.env
 backend/.env.local
 .env

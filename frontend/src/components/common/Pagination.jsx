@@ -11,7 +11,7 @@ const Pagination = ({
 
   return (
     <div className={`flex items-center justify-between px-4 py-3 bg-white border border-slate-200 border-t-0 rounded-b-xl ${className}`}>
-      {/* Description */}
+
       <div className="hidden sm:block">
         <p className="text-xs text-slate-500">
           Page <span className="font-semibold text-slate-800">{currentPage}</span> of{' '}
@@ -19,7 +19,7 @@ const Pagination = ({
         </p>
       </div>
 
-      {/* Buttons */}
+
       <div className="flex justify-between sm:justify-end gap-2 w-full sm:w-auto">
         <button
           onClick={() => onPageChange(currentPage - 1)}

@@ -104,7 +104,7 @@ const RoomForm = () => {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      {/* Back link & Header */}
+
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate('/rooms')}
@@ -124,7 +124,7 @@ const RoomForm = () => {
 
       <Card>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Room Number */}
+
           <Input
             label="Room Number"
             name="roomNumber"
@@ -140,7 +140,7 @@ const RoomForm = () => {
             })}
           />
 
-          {/* Room Type */}
+
           <Select
             label="Room Type"
             name="roomType"
@@ -154,7 +154,7 @@ const RoomForm = () => {
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Capacity */}
+
             <Input
               label="Bed Capacity"
               name="capacity"
@@ -168,7 +168,7 @@ const RoomForm = () => {
               })}
             />
 
-            {/* Monthly Rent */}
+
             <Input
               label="Monthly Rent (INR)"
               name="monthlyRent"
@@ -184,7 +184,7 @@ const RoomForm = () => {
             />
           </div>
 
-          {/* Status */}
+
           <Select
             label="Room Availability Status"
             name="roomStatus"
@@ -197,7 +197,7 @@ const RoomForm = () => {
             })}
           />
 
-          {/* Action Buttons */}
+
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <Button
               variant="secondary"

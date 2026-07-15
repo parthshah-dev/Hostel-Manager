@@ -50,7 +50,7 @@ const ChangePassword = () => {
 
   return (
     <div className="space-y-6 max-w-xl mx-auto">
-      {/* Header */}
+
       <div>
         <h1 className="text-2xl font-black text-slate-800 tracking-tight">Security Settings</h1>
         <p className="text-xs text-slate-400 mt-1">Manage and update your administrator credentials.</p>
@@ -70,7 +70,7 @@ const ChangePassword = () => {
             </div>
           </div>
 
-          {/* Current Password */}
+
           <div className="relative">
             <Input
               label="Current Password"
@@ -92,7 +92,7 @@ const ChangePassword = () => {
             </button>
           </div>
 
-          {/* New Password */}
+
           <div className="relative">
             <Input
               label="New Password"
@@ -115,7 +115,7 @@ const ChangePassword = () => {
             </button>
           </div>
 
-          {/* Confirm Password */}
+
           <div className="relative">
             <Input
               label="Confirm New Password"
@@ -138,7 +138,7 @@ const ChangePassword = () => {
             </button>
           </div>
 
-          {/* Save Button */}
+
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <Button
               type="submit"

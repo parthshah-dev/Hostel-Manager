@@ -10,7 +10,7 @@ const SearchBar = ({
 }) => {
   return (
     <div className={`flex flex-col sm:flex-row gap-3 w-full items-stretch sm:items-center ${className}`}>
-      {/* Search Input */}
+
       <div className="relative flex-1">
         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
           <Search className="w-4 h-4" />
@@ -24,7 +24,7 @@ const SearchBar = ({
         />
       </div>
 
-      {/* Extra Filters / Dropdowns */}
+
       {children && (
         <div className="flex flex-wrap items-center gap-2">
           {children}

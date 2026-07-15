@@ -28,6 +28,12 @@ public class EmailServiceImpl implements EmailService {
     @Value("${brevo.sender.email}")
     private String senderEmail;
 
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
+    @Value("${app.backend.url:https://hostelease-db.onrender.com}")
+    private String backendUrl;
+
     public EmailServiceImpl() {
         this.restClient = RestClient.create();
     }
@@ -35,7 +41,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendActivationEmail(String toEmail, String fullName, String token) {
         String subject = "Activate your Hostel Management Account";
-        String activationUrl = "http://localhost:8080/api/auth/activate?token=" + token;
+        String activationUrl = frontendUrl + "/activate?token=" + token;
 
         String htmlBody = String.format(
                 "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;\">" +
@@ -75,7 +81,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendForgotPasswordEmail(String toEmail, String fullName, String token) {
         String subject = "Reset Password - Hostel Management";
-        String resetUrl = "http://localhost:8080/api/auth/reset-password?token=" + token;
+        String resetUrl = backendUrl + "/api/auth/reset-password?token=" + token;
 
         String htmlBody = String.format(
                 "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;\">" +

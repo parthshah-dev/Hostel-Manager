@@ -30,7 +30,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <>
-      {/* Mobile Backdrop */}
+
       {isOpen && (
         <div 
           className="fixed inset-0 bg-slate-900/40 z-20 md:hidden transition-opacity duration-300"
@@ -38,13 +38,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         />
       )}
 
-      {/* Sidebar Container */}
+
       <aside 
         className={`fixed top-0 bottom-0 left-0 z-30 w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-screen text-slate-300 transition-transform duration-300 md:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        {/* Brand Header */}
+
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800 bg-slate-950/20">
           <div className="flex items-center gap-2.5">
             <div className="bg-blue-600 p-2 rounded-lg text-white">
@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </button>
         </div>
 
-        {/* Navigation Section */}
+
         <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -89,7 +89,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           })}
         </nav>
 
-        {/* Footer Area */}
+
         <div className="p-4 border-t border-slate-800 bg-slate-950/10">
           <div className="px-4 py-2 bg-slate-950/20 border border-slate-800 rounded-lg mb-3">
             <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Signed In As</p>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Loader = ({ 
-  type = 'spinner', // 'spinner' | 'skeleton' | 'full'
+  type = 'spinner', 
   rows = 3, 
   className = '' 
 }) => {

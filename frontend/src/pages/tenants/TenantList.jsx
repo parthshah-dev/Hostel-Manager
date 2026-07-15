@@ -17,14 +17,14 @@ const TenantList = () => {
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Search & Filter state
+
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Pagination state
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Confirm delete dialog state
+
   const [deleteId, setDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -61,7 +61,7 @@ const TenantList = () => {
     }
   };
 
-  // Filter & search implementation
+
   const filteredTenants = tenants.filter((tenant) => {
     return (
       tenant.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -70,7 +70,7 @@ const TenantList = () => {
     );
   });
 
-  // Pagination calculation
+
   const totalPages = Math.ceil(filteredTenants.length / itemsPerPage);
   const paginatedTenants = filteredTenants.slice(
     (currentPage - 1) * itemsPerPage,
@@ -83,7 +83,7 @@ const TenantList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">Tenant Management</h1>
@@ -98,7 +98,7 @@ const TenantList = () => {
         </Button>
       </div>
 
-      {/* Search Bar */}
+
       <Card bodyClassName="py-4">
         <SearchBar
           value={searchQuery}
@@ -110,7 +110,7 @@ const TenantList = () => {
         />
       </Card>
 
-      {/* Tenants Table */}
+
       {loading ? (
         <Loader type="spinner" className="py-20" />
       ) : paginatedTenants.length === 0 ? (
@@ -189,7 +189,7 @@ const TenantList = () => {
         </Card>
       )}
 
-      {/* Delete Dialog */}
+
       <ConfirmDialog
         isOpen={deleteId !== null}
         onClose={() => setDeleteId(null)}

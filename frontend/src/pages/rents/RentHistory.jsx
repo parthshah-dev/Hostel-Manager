@@ -17,16 +17,16 @@ const RentHistory = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Search & Filter state
+
   const [searchQuery, setSearchQuery] = useState('');
   const [monthFilter, setMonthFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Pagination state
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Selected receipt modal
+
   const [receiptRent, setReceiptRent] = useState(null);
 
   const fetchHistory = async () => {
@@ -46,7 +46,7 @@ const RentHistory = () => {
     fetchHistory();
   }, []);
 
-  // Filter history logic
+
   const filteredHistory = history.filter((item) => {
     const matchesSearch = 
       item.tenantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,7 +58,7 @@ const RentHistory = () => {
     return matchesSearch && matchesMonth && matchesStatus;
   });
 
-  // Pagination
+
   const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
   const paginatedHistory = filteredHistory.slice(
     (currentPage - 1) * itemsPerPage,
@@ -67,7 +67,7 @@ const RentHistory = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate('/rents')}
@@ -81,7 +81,7 @@ const RentHistory = () => {
         </div>
       </div>
 
-      {/* Filter panel */}
+
       <Card bodyClassName="py-4">
         <SearchBar
           value={searchQuery}
@@ -123,7 +123,7 @@ const RentHistory = () => {
         </SearchBar>
       </Card>
 
-      {/* History table */}
+
       {loading ? (
         <Loader type="spinner" className="py-20" />
       ) : paginatedHistory.length === 0 ? (
@@ -197,7 +197,7 @@ const RentHistory = () => {
         </Card>
       )}
 
-      {/* Receipts Modal */}
+
       <Modal
         isOpen={receiptRent !== null}
         onClose={() => setReceiptRent(null)}
